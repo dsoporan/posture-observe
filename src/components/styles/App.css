@@ -1,0 +1,12 @@
+body {
+    margin: auto;
+}
+
+.logo {
+    height: 100%;
+    width: 4%;
+}
+
+.profile-menu-item {
+    text-decoration: none;
+}
