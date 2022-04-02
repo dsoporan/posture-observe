@@ -10,7 +10,7 @@ export function useAuth(){
 
 export default function AuthProvider({ children }){
 
-    const [currentUser, setCurrentUser] = useState();
+    const [currentUser, setCurrentUser] = useState({});
     const theme = createTheme();
 
     function signup(email, password){
