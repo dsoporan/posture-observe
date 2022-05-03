@@ -1,0 +1,35 @@
+.sports-container {
+    height: 100%;
+}
+
+.sports-cards-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0 !important;
+}
+
+.sports-image {
+    position: relative;
+    width: 94%;
+    object-fit: fill;
+    border-radius: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.image-card-container {
+    display: flex;
+    justify-content: center;
+    height: 50%;
+}
+
+.card-text-container {
+    height: 42%;
+    margin: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
