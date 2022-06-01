@@ -1,14 +1,17 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import * as tf from '@tensorflow/tfjs';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import Webcam from 'react-webcam';
 import {drawPoint, drawSegment} from "../../utils/draw-helper";
 import {keypointConnections, POINTS} from "../../utils/data";
+import {Button, FormControl, TextField} from "@mui/material";
+import "./webcam.css"
 
-export default function WebcamComponent(){
+export default function WebcamComponent({ setStartedPose, pose: propsPose }){
+  const [isCorrectPosture, setIsCorrectPosture] = useState(false);
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
-  let skeletonColor = 'rgb(255,255,255)'
+  let skeletonColor = 'rgb(255,255,255)';
 
   const CLASS_NO = {
     Chair: 0,
@@ -20,7 +23,7 @@ export default function WebcamComponent(){
     Plank: 6,
     Prepare_fight: 7,
     Shoulder_stand: 8,
-    Traingle: 9,
+    Triangle: 9,
     Tree: 10,
     Warrior: 11,
     Wushu: 12
@@ -70,7 +73,7 @@ export default function WebcamComponent(){
     return tf.reshape(landmarks, [1, 34])
   }
 
-  // Load Posenet
+  // Load MoveNet
   const runMoveNet = async () => {
     // Load model with: SINGLEPOSE_THUNDER. A more accurate but slower single-pose detector.
     const detectorConfig = {modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER};
@@ -144,23 +147,23 @@ export default function WebcamComponent(){
       const classification = poseClassifier.predict(processedInput);
 
       classification.array().then((data) => {
-        const classNo = CLASS_NO['No_Pose']
-        console.log(data[0]);
-        if(data[0][classNo] > 0.95) {
-
-          console.log("NOPOSE");
-        //   if(!flag) {
-        //     countAudio.play()
-        //     setStartingTime(new Date(Date()).getTime())
-        //     flag = true
-        //   }
-        //   setCurrentTime(new Date(Date()).getTime())
-        //   skeletonColor = 'rgb(0,255,0)'
-        // } else {
-        //   flag = false
-        //   skeletonColor = 'rgb(255,255,255)'
-        //   countAudio.pause()
-        //   countAudio.currentTime = 0
+        const classNo = CLASS_NO[propsPose.title]
+        // console.log(data[0]);
+        if(data[0][classNo] > 0.99) {
+          // console.log("POSE: ", propsPose.title);
+          // console.log("Acc: ", data[0][classNo]);
+          if(!isCorrectPosture) {
+            // countAudio.play()
+            // setStartingTime(new Date(Date()).getTime())
+            setIsCorrectPosture(true);
+          }
+          // setCurrentTime(new Date(Date()).getTime())
+          skeletonColor = 'rgb(0,255,0)'
+        } else {
+          setIsCorrectPosture(false);
+          skeletonColor = 'rgb(255,255,255)'
+          // countAudio.pause()
+          // countAudio.currentTime = 0
         }
       })
     } catch(err) {
@@ -171,11 +174,38 @@ export default function WebcamComponent(){
   runMoveNet();
 
   return (
-    <div>
+    <div
+      style={{
+        maxWidth: 640,
+        marginTop: 50,
+        display: "inline-block"
+      }}>
+      <div className={'pose-data-container'}>
+        <TextField
+          disabled
+          id="outlined-disabled"
+          label="Pose Time"
+          defaultValue="Hello World"
+        />
+        <Button
+          variant="outlined"
+          color={'error'}
+          className={'pose-button'}
+          onClick={() => setStartedPose(false)}
+        >
+          Stop Pose
+        </Button>
+        <TextField
+          disabled
+          id="outlined-disabled"
+          label="Personal Best Pose Time"
+          defaultValue="Hello World"
+        />
+      </div>
       <Webcam
         ref={webcamRef}
         style={{
-          position: "absolute",
+          position: "relative",
           marginLeft: "auto",
           marginRight: "auto",
           left: 0,
@@ -184,6 +214,7 @@ export default function WebcamComponent(){
           zindex: 9,
           width: 640,
           height: 480,
+          borderRadius: 25
         }}/>
       <canvas
         ref={canvasRef}
@@ -197,6 +228,7 @@ export default function WebcamComponent(){
           zindex: 9,
           width: 640,
           height: 480,
+          borderRadius: 25
         }} />
     </div>
   )

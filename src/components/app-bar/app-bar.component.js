@@ -17,7 +17,24 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import {useAuth} from "../../contexts/AuthContext";
 
-const pages = ['Products', 'Pricing', 'Blog'];
+const pages = [
+    {
+        title: 'Home',
+        link: '/'
+    },
+    {
+        title: 'Yoga',
+        link: '/exercise/yoga'
+    },
+    {
+        title: 'Fitness',
+        link: '/exercise/fitness'
+    },
+    {
+        title: 'Taekwondo',
+        link: '/exercise/taekwondo'
+    },
+];
 
 const ResponsiveAppBar = () => {
     const { logout } = useAuth();
@@ -38,6 +55,10 @@ const ResponsiveAppBar = () => {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
+
+    const handleNavLink = (page) => {
+        // window.location = page.link;
+    }
 
     const handleLogout = async () => {
         try {
@@ -83,21 +104,23 @@ const ResponsiveAppBar = () => {
                             }}
                         >
                             {pages.map((page) => (
-                                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                    <Typography textAlign="center">{page}</Typography>
+                              <Link className={'link-button'} key={page.title} to={page.link}>
+                                <MenuItem onClick={handleCloseNavMenu}>
+                                    <Typography textAlign="center">{page.title}</Typography>
                                 </MenuItem>
+                              </Link>
                             ))}
                         </Menu>
                     </Box>
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                         {pages.map((page) => (
+                          <Link className={'link-button'} key={page.title} to={page.link}>
                             <Button
-                                key={page}
-                                onClick={handleCloseNavMenu}
                                 sx={{ my: 2, color: 'white', display: 'block' }}
                             >
-                                {page}
+                                {page.title}
                             </Button>
+                          </Link>
                         ))}
                     </Box>
 

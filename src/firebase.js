@@ -12,5 +12,7 @@ const app = firebase.initializeApp({
 
 app.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
+// export const db = firebase.firestore();
+
 export const auth = app.auth();
 export default app;
