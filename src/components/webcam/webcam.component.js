@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import * as tf from '@tensorflow/tfjs';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import Webcam from 'react-webcam';
@@ -6,12 +6,31 @@ import {drawPoint, drawSegment} from "../../utils/draw-helper";
 import {keypointConnections, POINTS} from "../../utils/data";
 import {Button, FormControl, TextField} from "@mui/material";
 import "./webcam.css"
+import { useSpeechSynthesis } from 'react-speech-kit';
+
+let isCorrectPosture = false;
+let talkedCorrect = false;
+let talkedIncorrect = false;
 
 export default function WebcamComponent({ setStartedPose, pose: propsPose }){
-  const [isCorrectPosture, setIsCorrectPosture] = useState(false);
+  const [startingTime, setStartingTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [poseTime, setPoseTime] = useState(0);
+  const [bestTime, setBestTime] = useState(0);
+  const { speak } = useSpeechSynthesis();
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   let skeletonColor = 'rgb(255,255,255)';
+
+  useEffect(() => {
+    const timeDiff = (currentTime - startingTime) / 1000;
+    if(isCorrectPosture) {
+      setPoseTime(timeDiff)
+    }
+    if((currentTime - startingTime) / 1000 > bestTime) {
+      setBestTime(timeDiff)
+    }
+  }, [currentTime])
 
   const CLASS_NO = {
     Chair: 0,
@@ -149,21 +168,26 @@ export default function WebcamComponent({ setStartedPose, pose: propsPose }){
       classification.array().then((data) => {
         const classNo = CLASS_NO[propsPose.title]
         // console.log(data[0]);
-        if(data[0][classNo] > 0.99) {
+        if(data[0][classNo] > 0.97) {
           // console.log("POSE: ", propsPose.title);
           // console.log("Acc: ", data[0][classNo]);
-          if(!isCorrectPosture) {
-            // countAudio.play()
-            // setStartingTime(new Date(Date()).getTime())
-            setIsCorrectPosture(true);
+          if(!isCorrectPosture && !talkedCorrect && talkedIncorrect) {
+            setStartingTime(new Date(Date()).getTime())
+            isCorrectPosture = true;
+            speak({ text: "Correct posture, keep it going!" })
+            talkedCorrect = true;
+            talkedIncorrect = false;
           }
-          // setCurrentTime(new Date(Date()).getTime())
+          setCurrentTime(new Date(Date()).getTime())
           skeletonColor = 'rgb(0,255,0)'
         } else {
-          setIsCorrectPosture(false);
+          if (!talkedIncorrect){
+            speak({ text: "Please correct your posture" })
+            talkedIncorrect = true;
+            talkedCorrect = false;
+          }
+          isCorrectPosture = false;
           skeletonColor = 'rgb(255,255,255)'
-          // countAudio.pause()
-          // countAudio.currentTime = 0
         }
       })
     } catch(err) {
@@ -185,7 +209,7 @@ export default function WebcamComponent({ setStartedPose, pose: propsPose }){
           disabled
           id="outlined-disabled"
           label="Pose Time"
-          defaultValue="Hello World"
+          value={poseTime + " seconds"}
         />
         <Button
           variant="outlined"
@@ -199,7 +223,7 @@ export default function WebcamComponent({ setStartedPose, pose: propsPose }){
           disabled
           id="outlined-disabled"
           label="Personal Best Pose Time"
-          defaultValue="Hello World"
+          value={bestTime + " seconds"}
         />
       </div>
       <Webcam
