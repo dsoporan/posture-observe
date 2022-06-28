@@ -54,12 +54,6 @@ export default function Signup(){
     const  handleSubmit = async (event) => {
         event.preventDefault();
         // const data = new FormData(event.currentTarget);
-        console.log({
-            firstName,
-            lastName,
-            email,
-            password
-        });
         const validateData = validateSignup({ firstName, lastName, email, password });
         setErrors(validateData.errors);
         if (!validateData.isError){

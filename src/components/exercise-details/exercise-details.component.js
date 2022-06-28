@@ -13,15 +13,16 @@ export default function ExerciseDetails({ sport }) {
   }, [sport])
 
   const handleChange = (e) => {
-    console.log(e.target.value);
+    setPosture(findPostureWithTitle(e.target.value));
+  }
+
+  const findPostureWithTitle = (title) => {
+    return sport.postures.find(element => element.title === title);
   }
 
   const handleStartPose = () => {
     setStartedPose(true);
   }
-
-  console.log(sport);
-  console.log(posture);
 
   return (
     <div className={'exercise-container-wrapper'}>
@@ -44,6 +45,7 @@ export default function ExerciseDetails({ sport }) {
         ) : (
           <WebcamComponent
             pose={posture}
+            sport={sport}
             setStartedPose={setStartedPose}
           />
         )}

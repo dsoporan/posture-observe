@@ -24,8 +24,6 @@ export default function Dashboard(){
         })
     }
 
-    console.log(sports);
-
     return (
         <div className={"dashboard-container"}>
             {/*DASHBOARD {currentUser.email}*/}

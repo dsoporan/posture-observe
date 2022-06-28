@@ -39,10 +39,6 @@ export default function Login(){
 
     const  handleSubmit = async (event) => {
         event.preventDefault();
-        console.log({
-            email,
-            password
-        });
         const validateData = validateLogin({ email, password });
         setErrors(validateData.errors);
         if (!validateData.isError){

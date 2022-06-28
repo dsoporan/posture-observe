@@ -11,7 +11,7 @@ export default function Exercise() {
 
   useEffect(() => {
     getSport();
-  }, [])
+  }, [sportParam])
 
   const getSport = () => {
     sportCollectionRef.onSnapshot((querySnapshot) => {
@@ -25,7 +25,6 @@ export default function Exercise() {
   }
 
   return (
-    // <h1>EXERCISE {sport}</h1>
     <div>
       {sport !== '' &&
         <ExerciseDetails sport={sport}/>
